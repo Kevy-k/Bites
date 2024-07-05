@@ -1,0 +1,77 @@
+Future<Map<String, Map<String, dynamic>>> retrieveUserOrders() async {
+  try {
+    final userOrders = FirebaseFirestore.instance.collection('users').doc(user.uid).collection('orders');
+    final orderSnapshot = await userOrders.get();
+    Map<String, Map<String, dynamic>> ordersMap = {};
+
+    for (var doc in orderSnapshot.docs) {
+      ordersMap[doc.id] = doc.data();
+    }
+    return ordersMap;
+  } catch (e) {
+    throw e;
+  }
+}
+
+Future<void> distributeOrdersToRestaurants() async {
+  try {
+    Map<String, Map<String, dynamic>> orders = await retrieveUserOrders();
+
+    for (var order in orders.values) {
+      List<dynamic> items = order['items']; // Retrieve the list of items
+
+      for (var item in items) {
+        String rid = item['rid'];
+        await FirebaseFirestore.instance
+            .collection('restaurants')
+            .doc(rid)
+            .collection('orders')
+            .add(item);
+      }
+    }
+  } catch (e) {
+    print("Error distributing orders: $e");
+  }
+}
+
+
+
+Future<void> distributeOrdersToRestaurants(BuildContext context) async {
+  final address = Provider.of<UserProfile>(context, listen: false).address;
+
+  try {
+    Map<String, Map<String, dynamic>> orders = await retrieveOrders();
+
+    for (var orderId in orders.keys) {
+      Map<String, dynamic> order = orders[orderId]!;
+      List<dynamic> items = order['items'];
+
+      Map<String, List<Map<String, dynamic>>> restaurantOrders = {};
+
+      for (var item in items) {
+        String rid = item['rid'];
+        if (!restaurantOrders.containsKey(rid)) {
+          restaurantOrders[rid] = [];
+        }
+        restaurantOrders[rid]!.add(item);
+      }
+
+      for (var entry in restaurantOrders.entries) {
+        String rid = entry.key;
+        List<Map<String, dynamic>> restaurantItems = entry.value;
+
+        await FirebaseFirestore.instance
+            .collection('restaurants')
+            .doc(rid)
+            .collection('orders')
+            .doc(orderId)
+            .set({
+          'Address': address,
+          'Items': restaurantItems,
+        });
+      }
+    }
+  } catch (e) {
+    print("Error distributing orders: $e");
+  }
+}

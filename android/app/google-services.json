@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "384364502874",
+    "project_id": "bites-466fc",
+    "storage_bucket": "bites-466fc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384364502874:android:c8b19e7f73861111be9d63",
+        "android_client_info": {
+          "package_name": "com.example.bites"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACqNe7m_G47snt7Gi68_s8x5D1AVyz3gc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
